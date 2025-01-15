@@ -1,0 +1,3 @@
+services:
+  football_league_simulator.league_service:
+    class: Drupal\football_league_simulator\Service\LeagueService

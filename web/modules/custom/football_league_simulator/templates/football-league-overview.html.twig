@@ -1,0 +1,61 @@
+<h1>Football League Simulator</h1>
+<button id="simulate-week">Next Week</button>
+
+<div id="results">
+  <h2>Match Results</h2>
+  <form id="edit-results-form">
+    <table>
+      <thead>
+      <tr>
+        <th>Team 1</th>
+        <th>Score 1</th>
+        <th>Team 2</th>
+        <th>Score 2</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for match in matches %}
+        <tr>
+          <td>{{ match.team1 }}</td>
+          <td>
+            <input type="number" name="matches[{{ loop.index0 }}][score1]" value="{{ match.score1 }}">
+          </td>
+          <td>{{ match.team2 }}</td>
+          <td>
+            <input type="number" name="matches[{{ loop.index0 }}][score2]" value="{{ match.score2 }}">
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <button type="button" id="save-results">Save Results</button>
+  </form>
+</div>
+
+<div id="league-table">
+  <h2>League Table</h2>
+  <table>
+    <thead>
+    <tr>
+      <th>Team</th>
+      <th>Points</th>
+      <th>GF</th>
+      <th>GA</th>
+      <th>GD</th>
+      <th>Win Chance (%)</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for team in data %}
+      <tr>
+        <td>{{ team.name }}</td>
+        <td>{{ team.points }}</td>
+        <td>{{ team.goals_for }}</td>
+        <td>{{ team.goals_against }}</td>
+        <td>{{ team.goals_for - team.goals_against }}</td>
+        <td>{{ team.win_chance }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>

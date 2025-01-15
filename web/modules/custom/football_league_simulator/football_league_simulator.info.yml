@@ -1,0 +1,6 @@
+name: 'Football League Simulator'
+type: module
+description: 'Simulates a football league with results, tables, and predictions.'
+core_version_requirement: ^10
+#dependencies:
+#  - drupal:ajax

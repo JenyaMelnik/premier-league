@@ -1,0 +1,16 @@
+football_league_simulator.overview:
+  path: '/football-league'
+  defaults:
+    _controller: '\Drupal\football_league_simulator\Controller\LeagueController::overview'
+    _title: 'Football League Simulator'
+  requirements:
+    _permission: 'access content'
+
+football_league_simulator.save_results:
+  path: '/football-league/save-results'
+  defaults:
+    _controller: '\Drupal\football_league_simulator\Controller\LeagueController::saveMatchResults'
+  requirements:
+    _permission: 'access content'
+  methods: [POST]
+

@@ -1,0 +1,12 @@
+<?php
+
+function football_league_simulator_theme() {
+  return [
+    'football_league_overview' => [
+      'variables' => [
+        'title' => NULL,
+        'message' => NULL,
+      ],
+    ],
+  ];
+}
