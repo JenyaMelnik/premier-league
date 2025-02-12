@@ -1,5 +1,3 @@
-{# <h1>Football League Simulator</h1> #}
-
 <div id="results" class="row">
   <div class="col-md-8" style="padding: 0;">
     <form>
@@ -50,21 +48,15 @@
         </tr>
         <tr>
           <td>Команда 1</td>
-          <td><input type="number" name="" value="{{ match.score2 ?? 3}}" style="width: 70px;"></td>
+          <td><input type="number" name="" value="{{ match.score1 ?? 3}}" style="width: 70px;"></td>
           <td><input type="number" name="" value="{{ match.score2 ?? 2}}" style="width: 70px;"></td>
           <td>команда 2</td>
         </tr>
-{#        <tr></tr>#}
-{#        <tr></tr>#}
-{#        <tr></tr>#}
         </tbody>
       </table>
-      <button id="save-results">Сохранить результат</button>
     </form>
   </div>
-
 </div>
-
 <div class="col-md-4">
   <table class="prediction-table">
     <thead>
@@ -74,32 +66,3 @@
     </thead>
   </table>
 </div>
-
-
-{# <div id="league-table"> #}
-{#  <h2>League Table</h2> #}
-{#  <table> #}
-{#    <thead> #}
-{#    <tr> #}
-{#      <th>Team</th> #}
-{#      <th>Points</th> #}
-{#      <th>GF</th> #}
-{#      <th>GA</th> #}
-{#      <th>GD</th> #}
-{#      <th>Win Chance (%)</th> #}
-{#    </tr> #}
-{#    </thead> #}
-{#    <tbody> #}
-{#    {% for team in data %} #}
-{#      <tr> #}
-{#        <td>{{ team.name }}</td> #}
-{#        <td>{{ team.points }}</td> #}
-{#        <td>{{ team.goals_for }}</td> #}
-{#        <td>{{ team.goals_against }}</td> #}
-{#        <td>{{ team.goals_for - team.goals_against }}</td> #}
-{#        <td>{{ team.win_chance }}</td> #}
-{#      </tr> #}
-{#    {% endfor %} #}
-{#    </tbody> #}
-{#  </table> #}
-{# </div> #}
