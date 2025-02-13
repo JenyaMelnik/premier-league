@@ -8,10 +8,12 @@ use Drupal\Core\Controller\ControllerBase;
 
 class LeagueController extends ControllerBase {
   private $leagueService;
+  private $schedule;
 
   public function __construct()
   {
     $this->leagueService = \Drupal::service('football_league_simulator.league_service');
+    $this->schedule = $this->leagueService->generateSchedule();
   }
 
   public function overview()
