@@ -19,13 +19,13 @@
         </tr>
         {% for team in teams %}
           <tr>
-            <td>{{ team.name }}</td>
-            <td>Очки</td>
-            <td>Игры</td>
-            <td>Выигрыши</td>
-            <td>Ничия</td>
-            <td>Проигрыш</td>
-            <td>Разница мячей</td>
+            <td>{{ team.team_name }}</td>
+            <td>{{ team.points }}</td>
+            <td>{{ team.played }}</td>
+            <td>{{ team.win }}</td>
+            <td>{{ team.draw }}</td>
+            <td>{{ team.lose }}</td>
+            <td>{{ team.goal_difference }}</td>
           </tr>
         {% endfor %}
         </tbody>
@@ -44,14 +44,16 @@
         </thead>
         <tbody>
         <tr>
-          <td colspan="4">Результат игр на неделе</td>
+          <td colspan="4">Результат игр на {{ lastWeek }} неделе</td>
         </tr>
-        <tr>
-          <td>Команда 1</td>
-          <td><input type="number" name="" value="{{ match.score1 ?? 3}}" style="width: 70px;"></td>
-          <td><input type="number" name="" value="{{ match.score2 ?? 2}}" style="width: 70px;"></td>
-          <td>команда 2</td>
-        </tr>
+        {% for match in matches %}
+          <tr>
+            <td>{{ match.team_1_name }}</td>
+            <td><input type="number" name="" value="{{ match.score_team_1 }}" style="width: 70px;"></td>
+            <td><input type="number" name="" value="{{ match.score_team_2 }}" style="width: 70px;"></td>
+            <td>{{ match.team_2_name }}</td>
+          </tr>
+        {% endfor %}
         </tbody>
       </table>
     </form>
