@@ -15,29 +15,30 @@ class LeagueController extends ControllerBase {
 
   public function __construct() {
     $this->leagueService = \Drupal::service('football_league_simulator.league_service');
-    $this->leagueService->generateWeekMatches();
+    $this->leagueService->generateFirstWeek();
     $this->tournamentData = $this->leagueService->getTournamentData();
     $this->lastWeek = $this->leagueService->getLastPlayedWeek();
     $this->matchesData = $this->leagueService->getMatchesData();
   }
 
-  public function playWeek() {
-//    $this->leagueService->generateWeekMatches();
-//    $this->tournamentData = $this->leagueService->getTournamentData();
-//    $this->lastWeek = $this->leagueService->getLastPlayedWeek();
-//    $this->matchesData = $this->leagueService->getMatchesData();
+  public function simulateWeek() {
+    $this->leagueService->generateWeekMatches();
+    $this->tournamentData = $this->leagueService->getTournamentData();
+    $this->lastWeek = $this->leagueService->getLastPlayedWeek();
+    $this->matchesData = $this->leagueService->getMatchesData();
+
+    return new JsonResponse(['success' => true]);
   }
 
   public function overview() {
     return [
       '#theme' => 'football_league_overview',
-      '#attached' => [
-        'library' => ['football_league_simulator/football_league_js'],
-      ],
       '#teams' => $this->tournamentData,
       '#lastWeek' => $this->lastWeek,
       '#matches' => $this->matchesData,
+      '#cache' => [
+        'max-age' => 0,
+      ],
     ];
   }
-
 }

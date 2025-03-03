@@ -103,6 +103,14 @@ class LeagueService {
     return $schedule;
   }
 
+  public function generateFirstWeek() {
+    $nodeId = $this->getLastTournamentEntityIds(1);
+
+    if (empty($nodeId)) {
+      $this->generateWeekMatches();
+    }
+  }
+
   public function generateWeekMatches() {
 
     $tournamentWeek = 1;
@@ -294,6 +302,12 @@ class LeagueService {
         'draw' => $tournament->get('field_draw')->value,
         'goal_difference' => $tournament->get('field_goal_difference')->value,
       ];
+      usort($tournamentsWithTeams, function ($a, $b) {
+        if ($a['points'] === $b['points']) {
+          return $b['goal_difference'] <=> $a['goal_difference'];
+        }
+        return $b['points'] <=> $a['points'];
+      });
     }
     return $tournamentsWithTeams;
   }

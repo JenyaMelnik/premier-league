@@ -6,11 +6,11 @@ football_league_simulator.overview:
   requirements:
     _permission: 'access content'
 
-#football_league_simulator.save_results:
-#  path: '/football-league/save-results'
-#  defaults:
-#    _controller: '\Drupal\football_league_simulator\Controller\LeagueController::saveMatchResults'
-#  requirements:
-#    _permission: 'access content'
-#  methods: [POST]
-
+football_league_simulator.simulate_week:
+  path: '/football-league/simulate-week'
+  defaults:
+    _controller: 'Drupal\football_league_simulator\Controller\LeagueController::simulateWeek'
+    _title: 'Simulate Week'
+  requirements:
+    _permission: 'access content'
+  methods: [POST]
