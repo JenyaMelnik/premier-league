@@ -30,6 +30,15 @@ class LeagueController extends ControllerBase {
     return new JsonResponse(['success' => true]);
   }
 
+  public function playAllMatches() {
+    $this->leagueService->generateAllMatches();
+    $this->tournamentData = $this->leagueService->getTournamentData();
+    $this->lastWeek = $this->leagueService->getLastPlayedWeek();
+    $this->matchesData = $this->leagueService->getMatchesData();
+
+    return new JsonResponse(['success' => true]);
+  }
+
   public function overview() {
     return [
       '#theme' => 'football_league_overview',

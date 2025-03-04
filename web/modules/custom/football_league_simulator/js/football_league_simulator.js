@@ -22,6 +22,27 @@
           $('#simulate-week').data('clicked', true);
         });
       }
+
+      if (!$('#play-all-matches').data('clicked')) {
+        $('#play-all-matches', context).on('click', function (e) {
+          e.preventDefault();
+          $.ajax({
+            url: Drupal.url('football-league/play-all-matches'),
+            type: 'POST',
+            dataType: 'json',
+            success: function (response) {
+              if (response.success) {
+                location.reload();
+              } else {
+                alert('Error when generating all matches.');
+              }
+            }
+          });
+
+          // Mark that the handler has been bound.
+          $('#play-all-matches').data('clicked', true);
+        });
+      }
     }
   };
 })(jQuery, Drupal);

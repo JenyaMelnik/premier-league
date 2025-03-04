@@ -27,6 +27,7 @@ class LeagueService {
       ->condition('type', 'tournament')
       ->condition('status', 1) // Только опубликованные ноды
       ->accessCheck(TRUE)
+      ->sort('field_tournament_week', 'DESC')
       ->sort('created', 'DESC')
       ->range(0, $numberOfEntities)
       ->execute();
@@ -34,7 +35,7 @@ class LeagueService {
 
   public function getLastPlayedWeek() {
     $nodeId = $this->getLastTournamentEntityIds(1);
-    $currentWeek = 'Unknown';
+    $currentWeek = 0;
     if (!empty($nodeId)) {
       $nid = reset($nodeId);
       $node = Node::load($nid);
@@ -58,6 +59,7 @@ class LeagueService {
     $totalRounds = $numTeams - 1;
     $matchesPerRound = $numTeams / 2;
     $schedule = [];
+    $restingTeam = null;
 
     // Generation of the first round.
     for ($round = 0; $round < $totalRounds; $round++) {
@@ -199,6 +201,16 @@ class LeagueService {
     }
   }
 
+  public function generateAllMatches() {
+    $lastPlayedWeek = $this->getLastPlayedWeek();
+    $fullSchedule = $this->generateSchedule();
+    $totalWeeks = count($fullSchedule);
+
+    for ($week = $lastPlayedWeek + 1; $week <= $totalWeeks; $week++) {
+      $this->generateWeekMatches();
+    }
+  }
+
   public function saveTournament($tournamentWeek, $teamId, $teamPoints = 0, $teamWin = 0, $teamLose = 0, $teamDraw = 0, $teamGoalDifference = 0, $playedGame = 0) {
 
     $teamPlayed = 0;
@@ -304,6 +316,9 @@ class LeagueService {
       ];
       usort($tournamentsWithTeams, function ($a, $b) {
         if ($a['points'] === $b['points']) {
+          if ($a['goal_difference'] === $b['goal_difference']) {
+            return strcmp($a['team_name'], $b['team_name']);
+          }
           return $b['goal_difference'] <=> $a['goal_difference'];
         }
         return $b['points'] <=> $a['points'];
