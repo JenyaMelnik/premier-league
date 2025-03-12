@@ -9,7 +9,7 @@ function football_league_simulator_theme() {
         'title' => NULL,
         'message' => NULL,
         'teams' => [],
-        'lastWeek' => [],
+        'isAllWeeksPlayed' => [],
         'matches' => [],
       ],
       'template' => 'football-league-overview',

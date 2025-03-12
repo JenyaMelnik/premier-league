@@ -30,8 +30,8 @@
         {% endfor %}
         </tbody>
       </table>
-      <button id="play-all-matches">Play all matches</button>
-      <button id="simulate-week">Next week</button>
+      <button id="play-all-matches" {% if isAllWeeksPlayed %}disabled{% endif %} >Play all matches</button>
+      <button id="simulate-week" {% if isAllWeeksPlayed %}disabled{% endif %} >Next week</button>
     </form>
   </div>
   <div class="col-md-4" style="padding: 0;">
@@ -43,16 +43,18 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-          <td colspan="4">Результат игр на {{ lastWeek }} неделе</td>
-        </tr>
-        {% for match in matches %}
+        {% for week, weekMatches in matches %}
           <tr>
-            <td>{{ match.team_1_name }}</td>
-            <td><input type="number" name="" value="{{ match.score_team_1 }}" style="width: 70px;"></td>
-            <td><input type="number" name="" value="{{ match.score_team_2 }}" style="width: 70px;"></td>
-            <td>{{ match.team_2_name }}</td>
+            <td colspan="4">Результат игр на {{ week }} неделе</td>
           </tr>
+          {% for match in weekMatches %}
+            <tr>
+              <td>{{ match.team_1_name }}</td>
+              <td><input type="number" name="" value="{{ match.score_team_1 }}" style="width: 70px;"></td>
+              <td><input type="number" name="" value="{{ match.score_team_2 }}" style="width: 70px;"></td>
+              <td>{{ match.team_2_name }}</td>
+            </tr>
+          {% endfor %}
         {% endfor %}
         </tbody>
       </table>

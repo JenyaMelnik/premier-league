@@ -19,6 +19,7 @@ class LeagueService {
       ->execute();
 
     $teams = Node::loadMultiple($query);
+
     return array_keys($teams);
   }
 
@@ -44,6 +45,7 @@ class LeagueService {
         $currentWeek = $node->get('field_tournament_week')->value;
       }
     }
+
     return $currentWeek;
   }
 
@@ -103,6 +105,15 @@ class LeagueService {
     }
 
     return $schedule;
+  }
+
+  public function isAllWeeksPlayed() {
+    $schedule = $this->generateSchedule();
+    $totalWeeks = count($schedule);
+
+    $lastPlayedWeek = $this->getLastPlayedWeek();
+
+    return $lastPlayedWeek >= $totalWeeks;
   }
 
   public function generateFirstWeek() {
@@ -324,6 +335,7 @@ class LeagueService {
         return $b['points'] <=> $a['points'];
       });
     }
+
     return $tournamentsWithTeams;
   }
 
@@ -353,7 +365,7 @@ class LeagueService {
       $team1Id = $match->get('field_team_1_id')->value;
       $team2Id = $match->get('field_team_2_id')->value;
 
-      $result[] = [
+      $result[$currentWeek][] = [
         'match_id' => $match->id(),
         'team_1_name' => isset($teams[$team1Id]) ? $teams[$team1Id]->get('title')->value : 'Unknown',
         'team_2_name' => isset($teams[$team2Id]) ? $teams[$team2Id]->get('title')->value : 'Unknown',
@@ -361,6 +373,46 @@ class LeagueService {
         'score_team_2' => $match->get('field_score_team_2')->value,
       ];
     }
+
+    return $result;
+  }
+
+  public function getAllMatchesData() {
+    $matchQuery = \Drupal::entityQuery('node')
+      ->condition('type', 'match')
+      ->condition('status', 1)
+      ->accessCheck(TRUE)
+      ->execute();
+
+    $matches = Node::loadMultiple($matchQuery);
+
+    $teamIds = [];
+    foreach ($matches as $match) {
+      $team1Id = $match->get('field_team_1_id')->value;
+      $team2Id = $match->get('field_team_2_id')->value;
+      $teamIds[$team1Id] = $team1Id;
+      $teamIds[$team2Id] = $team2Id;
+    }
+
+    $teams = Node::loadMultiple($teamIds);
+
+    $result = [];
+    foreach ($matches as $match) {
+      $week = $match->get('field_match_week')->value;
+      $team1Id = $match->get('field_team_1_id')->value;
+      $team2Id = $match->get('field_team_2_id')->value;
+
+      $matchData = [
+        'match_id' => $match->id(),
+        'team_1_name' => isset($teams[$team1Id]) ? $teams[$team1Id]->get('title')->value : 'Unknown',
+        'team_2_name' => isset($teams[$team2Id]) ? $teams[$team2Id]->get('title')->value : 'Unknown',
+        'score_team_1' => $match->get('field_score_team_1')->value,
+        'score_team_2' => $match->get('field_score_team_2')->value,
+      ];
+
+      $result[$week][] = $matchData;
+    }
+
     return $result;
   }
 
