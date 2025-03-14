@@ -12,15 +12,19 @@ class LeagueController extends ControllerBase {
   private $tournamentData;
   private $matchesData;
   private $allMatchesData;
-  private $isAllWeeksPlayed;
+  private $probabilities;
+  private $allProbabilities;
+  private $weeksLeft;
 
   public function __construct() {
     $this->leagueService = \Drupal::service('football_league_simulator.league_service');
     $this->leagueService->generateFirstWeek();
     $this->tournamentData = $this->leagueService->getTournamentData();
     $this->matchesData = $this->leagueService->getMatchesData();
+    $this->probabilities = $this->leagueService->calculateWeekWinProbabilities();
+    $this->allProbabilities = $this->leagueService->calculateTournamentWinProbabilities();
     $this->allMatchesData = $this->leagueService->getAllMatchesData();
-    $this->isAllWeeksPlayed = $this->leagueService->isAllWeeksPlayed();
+    $this->weeksLeft = $this->leagueService->weeksLeft();
   }
 
   public function simulateWeek() {
@@ -39,6 +43,12 @@ class LeagueController extends ControllerBase {
     return new JsonResponse(['success' => true]);
   }
 
+  public function playNewTournament() {
+    $this->leagueService->generateNewTournament();
+
+    return new JsonResponse(['success' => true]);
+  }
+
   public function overview() {
     $session = \Drupal::service('session');
     $lastAction = $session->get('last_action', 'simulateWeek');
@@ -47,11 +57,16 @@ class LeagueController extends ControllerBase {
       ? $this->allMatchesData
       : $this->matchesData;
 
+    $probabilities = ($lastAction === 'playAllMatches')
+      ? $this->allProbabilities
+      : $this->probabilities;
+
     return [
       '#theme' => 'football_league_overview',
       '#teams' => $this->tournamentData,
       '#matches' => $matches,
-      '#isAllWeeksPlayed' => $this->isAllWeeksPlayed,
+      '#probabilities' => $probabilities,
+      '#weeksLeft' => $this->weeksLeft,
       '#cache' => [
         'max-age' => 0,
       ],

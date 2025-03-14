@@ -26,11 +26,20 @@ class LeagueService {
   public function getLastTournamentEntityIds($numberOfEntities) {
     return \Drupal::entityQuery('node')
       ->condition('type', 'tournament')
-      ->condition('status', 1) // Только опубликованные ноды
+      ->condition('status', 1)
       ->accessCheck(TRUE)
       ->sort('field_tournament_week', 'DESC')
       ->sort('created', 'DESC')
       ->range(0, $numberOfEntities)
+      ->execute();
+  }
+
+  public function getTournamentEntityIds($numberOfEntities, $week) {
+    return \Drupal::entityQuery('node')
+      ->condition('type', 'tournament')
+      ->condition('status', 1)
+      ->condition('field_tournament_week', $week)
+      ->accessCheck(TRUE)
       ->execute();
   }
 
@@ -86,7 +95,7 @@ class LeagueService {
       $schedule[$round + 1] = [
         'matches' => $roundMatches,
         'resting_team' => $restingTeam,
-        ];
+      ];
     }
 
     // Generation of the second round (change hosts and guests).
@@ -107,13 +116,18 @@ class LeagueService {
     return $schedule;
   }
 
-  public function isAllWeeksPlayed() {
+  public function weeksLeft($week = 0) {
     $schedule = $this->generateSchedule();
     $totalWeeks = count($schedule);
 
     $lastPlayedWeek = $this->getLastPlayedWeek();
 
-    return $lastPlayedWeek >= $totalWeeks;
+    if ($week == 0) {
+      return $totalWeeks - $lastPlayedWeek;
+    } else {
+      return $totalWeeks - $week;
+    }
+
   }
 
   public function generateFirstWeek() {
@@ -235,8 +249,8 @@ class LeagueService {
     $nodeId = \Drupal::entityQuery('node')
       ->condition('type', 'tournament')
       ->condition('status', 1)
-      ->condition('field_trnmt_team_id', $teamId,)
-      ->condition('field_tournament_week', $lastWeek,)
+      ->condition('field_trnmt_team_id', $teamId)
+      ->condition('field_tournament_week', $lastWeek)
       ->accessCheck(TRUE)
       ->execute();
 
@@ -281,9 +295,14 @@ class LeagueService {
     $node->save();
   }
 
-  public function getTournamentData() {
+  public function getTournamentData($week = 0) {
     $countTeams = count($this->getTeamIds());
-    $query = $this->getLastTournamentEntityIds($countTeams);
+    if ($week === 0) {
+      $query = $this->getLastTournamentEntityIds($countTeams);
+    } else {
+      $query = $this->getTournamentEntityIds($countTeams, $week);
+    }
+
     $tournamentNodes = Node::loadMultiple($query);
 
     $teamIds = [];
@@ -339,12 +358,159 @@ class LeagueService {
     return $tournamentsWithTeams;
   }
 
+  function calculateWeekWinProbabilities() {
+    $gamesLeft = $this->weeksLeft();
+    $lastPlayedWeek = $this->getLastPlayedWeek();
+
+    if ($lastPlayedWeek < 4) {
+      return [];
+    }
+
+    $teams = $this->getTournamentData();
+    if (!$teams) {
+      return [];
+    }
+
+    $maxPoints = max(array_column($teams, 'points'));
+    $totalRating = 0;
+    $ratings = [];
+
+    foreach ($teams as $team) {
+      $baseRating = $team['points'] * 100;
+      $goalFactor = $team['goal_difference'] * 5;
+
+      $rating = $baseRating + $goalFactor;
+
+      if (($maxPoints - $team['points']) > (3 * $gamesLeft)) {
+        $rating = 0;
+      }
+
+      $ratings[] = [
+        'team' => $team['team_name'],
+        'points' => $team['points'],
+        'goal_difference' => $team['goal_difference'],
+        'rating' => $rating
+      ];
+      $totalRating += $rating;
+    }
+
+    // Вычисляем вероятность победы
+    $probabilities = [];
+
+    if ($gamesLeft === 0) {
+      usort($ratings, function ($a, $b) {
+        if ($b['points'] !== $a['points']) {
+          return $b['points'] - $a['points'];
+        }
+        return $b['goal_difference'] - $a['goal_difference'];
+      });
+
+      $topTeam = $ratings[0];
+      $winners = array_filter($ratings, function ($team) use ($topTeam) {
+        return $team['points'] === $topTeam['points'] && $team['goal_difference'] === $topTeam['goal_difference'];
+      });
+
+      foreach ($ratings as $team) {
+        $probabilities[$lastPlayedWeek][] = [
+          'team' => $team['team'],
+          'probability' => isset($winners[$team['team']]) ? 100.0 : 0.0
+        ];
+      }
+    } else {
+      foreach ($ratings as $team) {
+        $probability = $totalRating > 0 ? round($team['rating'] / $totalRating * 100, 2) : 0;
+        $probabilities[$lastPlayedWeek][] = [
+          'team' => $team['team'],
+          'probability' => $probability
+        ];
+      }
+    }
+
+    return $probabilities;
+  }
+
+  function calculateTournamentWinProbabilities() {
+    $lastPlayedWeek = $this->getLastPlayedWeek();
+    $probabilitiesByWeek = [];
+
+    if ($lastPlayedWeek < 4) {
+      return [];
+    }
+
+    for ($week = 4; $week <= $lastPlayedWeek; $week++) {
+      $gamesLeft = $this->weeksLeft($week);
+      $teams = $this->getTournamentData($week);
+
+      if (!$teams) {
+        continue;
+      }
+
+      $maxPoints = max(array_column($teams, 'points'));
+      $totalRating = 0;
+      $ratings = [];
+
+      foreach ($teams as $team) {
+        $baseRating = $team['points'] * 100;
+        $goalFactor = $team['goal_difference'] * 5;
+        $rating = $baseRating + $goalFactor;
+
+        if (($maxPoints - $team['points']) > (3 * $gamesLeft)) {
+          $rating = 0;
+        }
+
+        $ratings[] = [
+          'team' => $team['team_name'],
+          'points' => $team['points'],
+          'goal_difference' => $team['goal_difference'],
+          'rating' => $rating
+        ];
+        $totalRating += $rating;
+      }
+
+      $weekProbabilities = [];
+
+      // if
+      if ($gamesLeft === 0) {
+        usort($ratings, function ($a, $b) {
+          if ($b['points'] !== $a['points']) {
+            return $b['points'] - $a['points'];
+          }
+          return $b['goal_difference'] - $a['goal_difference'];
+        });
+
+        $topTeam = $ratings[0];
+        $winners = array_filter($ratings, function ($team) use ($topTeam) {
+          return $team['points'] === $topTeam['points'] && $team['goal_difference'] === $topTeam['goal_difference'];
+        });
+
+        foreach ($ratings as $team) {
+          $weekProbabilities[] = [
+            'team' => $team['team'],
+            'probability' => in_array($team, $winners) ? 100.0 : 0.0
+          ];
+        }
+      } else {
+        foreach ($ratings as $team) {
+          $probability = $totalRating > 0 ? round($team['rating'] / $totalRating * 100, 2) : 0;
+          $weekProbabilities[] = [
+            'team' => $team['team'],
+            'probability' => $probability
+          ];
+        }
+      }
+
+      $probabilitiesByWeek[$week] = $weekProbabilities;
+    }
+
+    return $probabilitiesByWeek;
+  }
+
   public function getMatchesData() {
     $currentWeek = $this->getLastPlayedWeek();
     $matchQuery = \Drupal::entityQuery('node')
       ->condition('type', 'match')
       ->condition('status', 1)
-      ->condition('field_match_week', $currentWeek,)
+      ->condition('field_match_week', $currentWeek)
       ->accessCheck(TRUE)
       ->execute();
 
@@ -416,4 +582,21 @@ class LeagueService {
     return $result;
   }
 
+  public function generateNewTournament() {
+    $types = ['match', 'tournament'];
+
+    foreach ($types as $type) {
+      $nids = \Drupal::entityQuery('node')
+        ->condition('type', $type)
+        ->accessCheck(FALSE)
+        ->execute();
+
+      if (!empty($nids)) {
+        $nodes = Node::loadMultiple($nids);
+        foreach ($nodes as $node) {
+          $node->delete();
+        }
+      }
+    }
+  }
 }
