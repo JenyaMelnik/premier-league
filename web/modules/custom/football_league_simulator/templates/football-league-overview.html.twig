@@ -51,12 +51,15 @@
           {% for match in weekMatches %}
             <tr>
               <td>{{ match.team_1_name }}</td>
-              <td><input type="number" name="" value="{{ match.score_team_1 }}" style="width: 70px;"></td>
-              <td><input type="number" name="" value="{{ match.score_team_2 }}" style="width: 70px;"></td>
+              <td><input type="number" name="results[{{ week }}][{{ loop.index0 }}][{{ match.team_1_id }}]" value="{{ match.score_team_1 }}" style="width: 70px;"></td>
+              <td><input type="number" name="results[{{ week }}][{{ loop.index0 }}][{{ match.team_2_id }}]" value="{{ match.score_team_2 }}" style="width: 70px;"></td>
               <td>{{ match.team_2_name }}</td>
             </tr>
           {% endfor %}
         {% endfor %}
+        <tr>
+          <td colspan="4"><button type="button" id="save-results">Save result</button></td>
+        </tr>
         </tbody>
       </table>
     </form>

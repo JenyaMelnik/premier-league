@@ -49,6 +49,13 @@ class LeagueController extends ControllerBase {
     return new JsonResponse(['success' => true]);
   }
 
+  public function saveResult(Request $request) {
+    $data = $request->request->all();
+    $this->leagueService->changeResults($data);
+
+    return new JsonResponse(['success' => true, 'status' => 'ok', 'received' => $data]);
+  }
+
   public function overview() {
     $session = \Drupal::service('session');
     $lastAction = $session->get('last_action', 'simulateWeek');

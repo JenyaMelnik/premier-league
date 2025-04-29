@@ -33,3 +33,11 @@ football_league_simulator.play_new_tournament:
     _permission: 'access content'
   methods: [ POST ]
 
+football_league_simulator.save_result:
+  path: '/football-league/save-result'
+  defaults:
+    _controller: 'Drupal\football_league_simulator\Controller\LeagueController::saveResult'
+    _title: 'Save result'
+  requirements:
+    _permission: 'access content'
+  methods: [ POST ]

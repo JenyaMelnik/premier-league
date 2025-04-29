@@ -64,6 +64,30 @@
           $('#play-new-tournament').data('clicked', true);
         });
       }
+
+      if (!$('#save-results').data('clicked')) {
+        $('#save-results', context).on('click', function (e) {
+          e.preventDefault();
+
+          const formData = $('#edit-results-form').serialize();
+          $.ajax({
+            url: Drupal.url('football-league/save-result'),
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+              if (response.success) {
+                // alert(formData);
+                location.reload();
+              } else {
+                alert('Error when saving result.');
+              }
+            }
+          });
+
+          // Mark that the handler has been bound.
+          $('#save-results').data('clicked', true);
+        });
+      }
     }
   };
 })(jQuery, Drupal);

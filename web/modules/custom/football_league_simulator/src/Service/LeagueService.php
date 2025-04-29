@@ -159,19 +159,8 @@ class LeagueService {
     // Play matched and save results.
     foreach ($weekSchedule['matches'] as $match) {
 
-      $team1Points = 0;
-      $team1Wins = 0;
-      $team1Lose = 0;
-      $team1Draw = 0;
-      $team1GoalDifference = 0;
-      $team2Points = 0;
-      $team2Wins = 0;
-      $team2Lose = 0;
-      $team2Draw = 0;
-      $team2GoalDifference = 0;
       $team1Id = $match[0];
       $team2Id = $match[1];
-      $playedGame = 1;
 
       if ($team1Id && $team2Id) {
         $team1 = Node::load($team1Id);
@@ -181,48 +170,91 @@ class LeagueService {
         $team1Score = rand(0, $team1Strength);
         $team2Score = rand(0, $team2Strength);
 
-        // Creating match entity.
-        $node = Node::create([
-          'type' => 'match',
-          'title' => 'Match ' . $matchNumber . ' week ' . $tournamentWeek,
-          'field_match_week' => $tournamentWeek,
-          'field_team_1_id' => $team1Id,
-          'field_team_2_id' => $team2Id,
-          'field_score_team_1' => $team1Score,
-          'field_score_team_2' => $team2Score,
-          'status' => 1,
-        ]);
+        $this->saveMatchAndTournament($matchNumber, $tournamentWeek, $team1Id, $team2Id, $team1Score, $team2Score);
 
-        $node->save();
-
-        // Creating tournament entity.
-        $team1GoalDifference = $team1Score - $team2Score;
-        $team2GoalDifference = $team2Score - $team1Score;
-
-        if ($team1Score > $team2Score) {
-          $team1Points = 3;
-          $team1Wins = 1;
-          $team2Lose = 1;
-        } elseif ($team1Score < $team2Score) {
-          $team2Points = 3;
-          $team2Wins = 1;
-          $team1Lose = 1;
-        } elseif ($team1Score === $team2Score) {
-          $team1Points = 1;
-          $team2Points = 1;
-          $team1Draw = 1;
-          $team2Draw = 1;
-        }
       }
-
-      $this->saveTournament($tournamentWeek, $team1Id, $team1Points, $team1Wins, $team1Lose, $team1Draw, $team1GoalDifference, $playedGame);
-      $this->saveTournament($tournamentWeek, $team2Id, $team2Points, $team2Wins, $team2Lose, $team2Draw, $team2GoalDifference, $playedGame);
 
       $matchNumber++;
     }
 
     if ($weekSchedule['resting_team']) {
       $this->saveTournament($tournamentWeek, $weekSchedule['resting_team']);
+    }
+  }
+
+  public function saveMatchAndTournament($matchNumber, $tournamentWeek, $team1Id, $team2Id, $team1Score, $team2Score) {
+    $team1Points = 0;
+    $team1Wins = 0;
+    $team1Lose = 0;
+    $team1Draw = 0;
+    $team2Points = 0;
+    $team2Wins = 0;
+    $team2Lose = 0;
+    $team2Draw = 0;
+    $playedGame = 1;
+
+    // Creating match entity.
+    $node = Node::create([
+      'type' => 'match',
+      'title' => 'Match ' . $matchNumber . ' week ' . $tournamentWeek,
+      'field_match_week' => $tournamentWeek,
+      'field_team_1_id' => $team1Id,
+      'field_team_2_id' => $team2Id,
+      'field_score_team_1' => $team1Score,
+      'field_score_team_2' => $team2Score,
+      'status' => 1,
+    ]);
+
+    $node->save();
+
+    // Creating tournament entity.
+    $team1GoalDifference = $team1Score - $team2Score;
+    $team2GoalDifference = $team2Score - $team1Score;
+
+    if ($team1Score > $team2Score) {
+      $team1Points = 3;
+      $team1Wins = 1;
+      $team2Lose = 1;
+    } elseif ($team1Score < $team2Score) {
+      $team2Points = 3;
+      $team2Wins = 1;
+      $team1Lose = 1;
+    } elseif ($team1Score === $team2Score) {
+      $team1Points = 1;
+      $team2Points = 1;
+      $team1Draw = 1;
+      $team2Draw = 1;
+    }
+
+    $this->saveTournament($tournamentWeek, $team1Id, $team1Points, $team1Wins, $team1Lose, $team1Draw, $team1GoalDifference, $playedGame);
+    $this->saveTournament($tournamentWeek, $team2Id, $team2Points, $team2Wins, $team2Lose, $team2Draw, $team2GoalDifference, $playedGame);
+  }
+
+  public function changeResults($data) {
+    if ($data['results']) {
+      $lastPlayedWeek = $this->getLastPlayedWeek();
+      if (count($data['results']) > 1) {
+        $this->removeMatchesAndTournament();
+      } else {
+        $this->removeMatchesAndTournament($lastPlayedWeek);
+      }
+
+      foreach ($data['results'] as $week=>$result) {
+        $matchNumber = 1;
+        foreach ($result as $match) {
+
+          $teamIds = array_keys($match);
+          $teamScores = array_values($match);
+          $team1Id = $teamIds[0];
+          $team1Score = $teamScores[0];
+          $team2Id = $teamIds[1];
+          $team2Score = $teamScores[1];
+
+          $this->saveMatchAndTournament($matchNumber, $week, $team1Id, $team2Id, $team1Score, $team2Score);
+
+          $matchNumber ++;
+        }
+      }
     }
   }
 
@@ -534,7 +566,9 @@ class LeagueService {
       $result[$currentWeek][] = [
         'match_id' => $match->id(),
         'team_1_name' => isset($teams[$team1Id]) ? $teams[$team1Id]->get('title')->value : 'Unknown',
+        'team_1_id' => $team1Id,
         'team_2_name' => isset($teams[$team2Id]) ? $teams[$team2Id]->get('title')->value : 'Unknown',
+        'team_2_id' => $team2Id,
         'score_team_1' => $match->get('field_score_team_1')->value,
         'score_team_2' => $match->get('field_score_team_2')->value,
       ];
@@ -571,7 +605,9 @@ class LeagueService {
       $matchData = [
         'match_id' => $match->id(),
         'team_1_name' => isset($teams[$team1Id]) ? $teams[$team1Id]->get('title')->value : 'Unknown',
+        'team_1_id' => $team1Id,
         'team_2_name' => isset($teams[$team2Id]) ? $teams[$team2Id]->get('title')->value : 'Unknown',
+        'team_2_id' => $team2Id,
         'score_team_1' => $match->get('field_score_team_1')->value,
         'score_team_2' => $match->get('field_score_team_2')->value,
       ];
@@ -583,13 +619,28 @@ class LeagueService {
   }
 
   public function generateNewTournament() {
+    $this->removeMatchesAndTournament();
+  }
+
+  public function removeMatchesAndTournament($week = 0) {
+
     $types = ['match', 'tournament'];
 
     foreach ($types as $type) {
-      $nids = \Drupal::entityQuery('node')
+      $query = \Drupal::entityQuery('node')
         ->condition('type', $type)
-        ->accessCheck(FALSE)
-        ->execute();
+        ->accessCheck(FALSE);
+
+      if ($week != 0) {
+        if ($type === 'match') {
+          $query->condition('field_match_week', $week);
+        }
+        elseif ($type === 'tournament') {
+          $query->condition('field_tournament_week', $week);
+        }
+      }
+
+      $nids = $query->execute();
 
       if (!empty($nids)) {
         $nodes = Node::loadMultiple($nids);
