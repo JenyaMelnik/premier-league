@@ -2,7 +2,8 @@
 
 namespace Drupal\football_league_simulator\Controller;
 
-use Drupal\node\Entity\Node;
+use Drupal\football_league_simulator\Service\LeagueService;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Controller\ControllerBase;
@@ -16,8 +17,8 @@ class LeagueController extends ControllerBase {
   private $allProbabilities;
   private $weeksLeft;
 
-  public function __construct() {
-    $this->leagueService = \Drupal::service('football_league_simulator.league_service');
+  public function __construct(LeagueService $leagueService) {
+    $this->leagueService = $leagueService;
     $this->leagueService->generateFirstWeek();
     $this->tournamentData = $this->leagueService->getTournamentData();
     $this->matchesData = $this->leagueService->getMatchesData();
@@ -25,6 +26,12 @@ class LeagueController extends ControllerBase {
     $this->allProbabilities = $this->leagueService->calculateTournamentWinProbabilities();
     $this->allMatchesData = $this->leagueService->getAllMatchesData();
     $this->weeksLeft = $this->leagueService->weeksLeft();
+  }
+
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('football_league_simulator.league_service')
+    );
   }
 
   public function simulateWeek() {

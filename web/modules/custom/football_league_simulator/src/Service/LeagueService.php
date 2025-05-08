@@ -2,9 +2,16 @@
 
 namespace Drupal\football_league_simulator\Service;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\node\Entity\Node;
 
 class LeagueService {
+
+  protected $entityTypeManager;
+
+  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
+    $this->entityTypeManager = $entityTypeManager;
+  }
 
   public function generateWeek($week) {
     $schedule = $this->generateSchedule();
@@ -13,34 +20,35 @@ class LeagueService {
   }
 
   public function getTeamIds() {
-    $query = \Drupal::entityQuery('node')
+    $query = $this->entityTypeManager->getStorage('node')->getQuery()
       ->condition('type', 'team')
-      ->accessCheck(TRUE)
-      ->execute();
+      ->accessCheck(TRUE);
 
-    $teams = Node::loadMultiple($query);
+    $ids = $query->execute();
 
-    return array_keys($teams);
+    return array_values($ids);
   }
 
   public function getLastTournamentEntityIds($numberOfEntities) {
-    return \Drupal::entityQuery('node')
+    $query = $this->entityTypeManager->getStorage('node')->getQuery()
       ->condition('type', 'tournament')
       ->condition('status', 1)
       ->accessCheck(TRUE)
       ->sort('field_tournament_week', 'DESC')
       ->sort('created', 'DESC')
-      ->range(0, $numberOfEntities)
-      ->execute();
+      ->range(0, $numberOfEntities);
+
+    return $query->execute();
   }
 
   public function getTournamentEntityIds($numberOfEntities, $week) {
-    return \Drupal::entityQuery('node')
+    $query = $this->entityTypeManager->getStorage('node')->getQuery()
       ->condition('type', 'tournament')
       ->condition('status', 1)
       ->condition('field_tournament_week', $week)
-      ->accessCheck(TRUE)
-      ->execute();
+      ->accessCheck(TRUE);
+
+    return $query->execute();
   }
 
   public function getLastPlayedWeek() {
@@ -48,7 +56,7 @@ class LeagueService {
     $currentWeek = 0;
     if (!empty($nodeId)) {
       $nid = reset($nodeId);
-      $node = Node::load($nid);
+      $node = $this->entityTypeManager->getStorage('node')->load($nid);
 
       if ($node->hasField('field_tournament_week')) {
         $currentWeek = $node->get('field_tournament_week')->value;
@@ -148,7 +156,7 @@ class LeagueService {
 
     if (!empty($nodeId)) {
       $nid = reset($nodeId);
-      $node = Node::load($nid);
+      $node = $this->entityTypeManager->getStorage('node')->load($nid);
       if ($node->hasField('field_tournament_week')) {
         $tournamentWeek = $node->get('field_tournament_week')->value + 1;
       }
@@ -163,8 +171,8 @@ class LeagueService {
       $team2Id = $match[1];
 
       if ($team1Id && $team2Id) {
-        $team1 = Node::load($team1Id);
-        $team2 = Node::load($team2Id);
+        $team1 = $this->entityTypeManager->getStorage('node')->load($team1Id);
+        $team2 = $this->entityTypeManager->getStorage('node')->load($team2Id);
         $team1Strength = $team1->get('field_team_strength')->value;
         $team2Strength = $team2->get('field_team_strength')->value;
         $team1Score = rand(0, $team1Strength);
@@ -278,7 +286,7 @@ class LeagueService {
     $prevTeamGoalDifference = 0;
     $lastWeek = $tournamentWeek - 1;
 
-    $nodeId = \Drupal::entityQuery('node')
+    $nodeId = $this->entityTypeManager->getStorage('node')->getQuery()
       ->condition('type', 'tournament')
       ->condition('status', 1)
       ->condition('field_trnmt_team_id', $teamId)
@@ -288,7 +296,7 @@ class LeagueService {
 
     if (!empty($nodeId)) {
       $nid = reset($nodeId);
-      $node = Node::load($nid);
+      $node = $this->entityTypeManager->getStorage('node')->load($nid);
       if ($node->hasField('field_played')) {
         $teamPlayed = $node->get('field_played')->value;
       }
@@ -328,6 +336,8 @@ class LeagueService {
   }
 
   public function getTournamentData($week = 0) {
+    $nodeStorage = $this->entityTypeManager->getStorage('node');
+
     $countTeams = count($this->getTeamIds());
     if ($week === 0) {
       $query = $this->getLastTournamentEntityIds($countTeams);
@@ -335,7 +345,7 @@ class LeagueService {
       $query = $this->getTournamentEntityIds($countTeams, $week);
     }
 
-    $tournamentNodes = Node::loadMultiple($query);
+    $tournamentNodes = $nodeStorage->loadMultiple($query);
 
     $teamIds = [];
     foreach ($tournamentNodes as $tournament) {
@@ -345,13 +355,13 @@ class LeagueService {
     // Load teams by their ID.
     $teams = [];
     if (!empty($teamIds)) {
-      $teamQuery = \Drupal::entityQuery('node')
+      $teamQuery = $nodeStorage->getQuery()
         ->condition('type', 'team')
         ->condition('nid', $teamIds, 'IN')
         ->accessCheck(TRUE)
         ->execute();
 
-      $teamNodes = Node::loadMultiple($teamQuery);
+      $teamNodes = $nodeStorage->loadMultiple($teamQuery);
 
       foreach ($teamNodes as $team) {
         $teams[$team->id()] = $team->get('title')->value;
@@ -538,15 +548,18 @@ class LeagueService {
   }
 
   public function getMatchesData() {
+    $nodeStorage = $this->entityTypeManager->getStorage('node');
+
     $currentWeek = $this->getLastPlayedWeek();
-    $matchQuery = \Drupal::entityQuery('node')
+
+    $matchQuery = $nodeStorage->getQuery()
       ->condition('type', 'match')
       ->condition('status', 1)
       ->condition('field_match_week', $currentWeek)
       ->accessCheck(TRUE)
       ->execute();
 
-    $currentWeekMatches = Node::loadMultiple($matchQuery);
+    $currentWeekMatches = $nodeStorage->loadMultiple($matchQuery);
 
     $teamIds = [];
     foreach ($currentWeekMatches as $match) {
@@ -556,7 +569,19 @@ class LeagueService {
       $teamIds[$team2Id] = $team2Id;
     }
 
-    $teams = Node::loadMultiple($teamIds);
+    $teams = [];
+    if (!empty($teamIds)) {
+      $teamQuery = $nodeStorage->getQuery()
+        ->condition('type', 'team')
+        ->condition('nid', array_values($teamIds), 'IN')
+        ->accessCheck(TRUE)
+        ->execute();
+
+      $teamNodes = $nodeStorage->loadMultiple($teamQuery);
+      foreach ($teamNodes as $team) {
+        $teams[$team->id()] = $team->get('title')->value;
+      }
+    }
 
     $result = [];
     foreach ($currentWeekMatches as $match) {
@@ -565,9 +590,9 @@ class LeagueService {
 
       $result[$currentWeek][] = [
         'match_id' => $match->id(),
-        'team_1_name' => isset($teams[$team1Id]) ? $teams[$team1Id]->get('title')->value : 'Unknown',
+        'team_1_name' => $teams[$team1Id] ?? 'Unknown',
         'team_1_id' => $team1Id,
-        'team_2_name' => isset($teams[$team2Id]) ? $teams[$team2Id]->get('title')->value : 'Unknown',
+        'team_2_name' => $teams[$team2Id] ?? 'Unknown',
         'team_2_id' => $team2Id,
         'score_team_1' => $match->get('field_score_team_1')->value,
         'score_team_2' => $match->get('field_score_team_2')->value,
@@ -578,13 +603,15 @@ class LeagueService {
   }
 
   public function getAllMatchesData() {
-    $matchQuery = \Drupal::entityQuery('node')
+    $nodeStorage = $this->entityTypeManager->getStorage('node');
+
+    $matchQuery = $nodeStorage->getQuery()
       ->condition('type', 'match')
       ->condition('status', 1)
       ->accessCheck(TRUE)
       ->execute();
 
-    $matches = Node::loadMultiple($matchQuery);
+    $matches = $nodeStorage->loadMultiple($matchQuery);
 
     $teamIds = [];
     foreach ($matches as $match) {
@@ -594,7 +621,19 @@ class LeagueService {
       $teamIds[$team2Id] = $team2Id;
     }
 
-    $teams = Node::loadMultiple($teamIds);
+    $teams = [];
+    if (!empty($teamIds)) {
+      $teamQuery = $nodeStorage->getQuery()
+        ->condition('type', 'team')
+        ->condition('nid', array_values($teamIds), 'IN')
+        ->accessCheck(TRUE)
+        ->execute();
+
+      $teamNodes = $nodeStorage->loadMultiple($teamQuery);
+      foreach ($teamNodes as $team) {
+        $teams[$team->id()] = $team->get('title')->value;
+      }
+    }
 
     $result = [];
     foreach ($matches as $match) {
@@ -604,9 +643,9 @@ class LeagueService {
 
       $matchData = [
         'match_id' => $match->id(),
-        'team_1_name' => isset($teams[$team1Id]) ? $teams[$team1Id]->get('title')->value : 'Unknown',
+        'team_1_name' => $teams[$team1Id] ?? 'Unknown',
         'team_1_id' => $team1Id,
-        'team_2_name' => isset($teams[$team2Id]) ? $teams[$team2Id]->get('title')->value : 'Unknown',
+        'team_2_name' => $teams[$team2Id] ?? 'Unknown',
         'team_2_id' => $team2Id,
         'score_team_1' => $match->get('field_score_team_1')->value,
         'score_team_2' => $match->get('field_score_team_2')->value,
@@ -623,11 +662,12 @@ class LeagueService {
   }
 
   public function removeMatchesAndTournament($week = 0) {
+    $nodeStorage = $this->entityTypeManager->getStorage('node');
 
     $types = ['match', 'tournament'];
 
     foreach ($types as $type) {
-      $query = \Drupal::entityQuery('node')
+      $query = $this->entityTypeManager->getStorage('node')->getQuery()
         ->condition('type', $type)
         ->accessCheck(FALSE);
 
@@ -643,7 +683,7 @@ class LeagueService {
       $nids = $query->execute();
 
       if (!empty($nids)) {
-        $nodes = Node::loadMultiple($nids);
+        $nodes = $nodeStorage->loadMultiple($nids);
         foreach ($nodes as $node) {
           $node->delete();
         }
