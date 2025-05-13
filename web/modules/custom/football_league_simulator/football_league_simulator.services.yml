@@ -1,5 +1,36 @@
 services:
-  football_league_simulator.league_service:
-    class: Drupal\football_league_simulator\Service\LeagueService
+  football_league_simulator.match_simulator_service:
+    class: Drupal\football_league_simulator\Service\MatchSimulatorService
     arguments:
+      - '@football_league_simulator.schedule_generator_service'
+      - '@football_league_simulator.tournament_repository'
+      - '@entity_type.manager'
+
+  football_league_simulator.probability_calculator_service:
+    class: Drupal\football_league_simulator\Service\ProbabilityCalculatorService
+    arguments:
+      - '@football_league_simulator.schedule_generator_service'
+      - '@football_league_simulator.tournament_repository'
+
+  football_league_simulator.schedule_generator_service:
+    class: Drupal\football_league_simulator\Service\ScheduleGeneratorService
+    arguments:
+      - '@football_league_simulator.team_repository'
+      - '@football_league_simulator.tournament_repository'
+
+  football_league_simulator.match_repository:
+    class: Drupal\football_league_simulator\Repository\MatchRepository
+    arguments:
+      - '@entity_type.manager'
+      - '@football_league_simulator.tournament_repository'
+
+  football_league_simulator.team_repository:
+    class: Drupal\football_league_simulator\Repository\TeamRepository
+    arguments:
+      - '@entity_type.manager'
+
+  football_league_simulator.tournament_repository:
+    class: Drupal\football_league_simulator\Repository\TournamentRepository
+    arguments:
+      - '@football_league_simulator.team_repository'
       - '@entity_type.manager'
