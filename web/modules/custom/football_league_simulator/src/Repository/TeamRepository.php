@@ -8,18 +8,13 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 class TeamRepository {
 
-  /** @var EntityTypeManagerInterface  */
   protected EntityTypeManagerInterface $entityTypeManager;
 
-  /**
-   * @param EntityTypeManagerInterface $entityTypeManager
-   */
   public function __construct(EntityTypeManagerInterface $entityTypeManager) {
     $this->entityTypeManager = $entityTypeManager;
   }
 
   /**
-   * @return array
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */

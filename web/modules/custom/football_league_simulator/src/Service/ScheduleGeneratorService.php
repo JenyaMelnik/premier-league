@@ -8,34 +8,26 @@ use Drupal\football_league_simulator\Repository\TeamRepository;
 use Drupal\football_league_simulator\Repository\TournamentRepository;
 
 class ScheduleGeneratorService {
-  /** @var TeamRepository  */
+
   protected TeamRepository $teamRepository;
-  /** @var TournamentRepository  */
   private TournamentRepository $tournamentRepository;
 
-  /**
-   * @param TeamRepository $teamRepository
-   * @param TournamentRepository $tournamentRepository
-   */
   public function __construct(TeamRepository $teamRepository, TournamentRepository $tournamentRepository) {
     $this->teamRepository = $teamRepository;
     $this->tournamentRepository = $tournamentRepository;
   }
 
   /**
-   * @param $week
-   * @return mixed
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
-  public function generateWeek($week): mixed {
+  public function generateWeek(int $week): mixed {
     $schedule = $this->generateSchedule();
 
     return $schedule[$week];
   }
 
   /**
-   * @return array
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
@@ -98,8 +90,6 @@ class ScheduleGeneratorService {
   }
 
   /**
-   * @param int $week
-   * @return int
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
@@ -114,7 +104,6 @@ class ScheduleGeneratorService {
     } else {
       return $totalWeeks - $week;
     }
-
   }
 
 }

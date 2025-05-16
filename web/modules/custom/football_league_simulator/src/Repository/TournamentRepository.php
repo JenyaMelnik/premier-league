@@ -6,31 +6,30 @@ use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\football_league_simulator\Service\TeamSorterService;
 use Drupal\node\Entity\Node;
 
 class TournamentRepository {
 
-  /** @var TeamRepository  */
   private TeamRepository $teamRepository;
-  /** @var EntityTypeManagerInterface  */
   protected EntityTypeManagerInterface $entityTypeManager;
+  private TeamSorterService $teamSorterService;
 
-  /**
-   * @param TeamRepository $teamRepository
-   * @param EntityTypeManagerInterface $entityTypeManager
-   */
-  public function __construct(TeamRepository $teamRepository, EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    TeamRepository $teamRepository,
+    EntityTypeManagerInterface $entityTypeManager,
+    TeamSorterService $teamSorterService
+  ) {
     $this->teamRepository = $teamRepository;
     $this->entityTypeManager = $entityTypeManager;
+    $this->teamSorterService = $teamSorterService;
   }
 
   /**
-   * @param $numberOfEntities
-   * @return array|int
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
-  public function getLastTournamentEntityIds($numberOfEntities): array|int {
+  public function getLastTournamentEntityIds(int $numberOfEntities): array|int {
     $query = $this->entityTypeManager->getStorage('node')->getQuery()
       ->condition('type', 'tournament')
       ->condition('status', 1)
@@ -43,13 +42,10 @@ class TournamentRepository {
   }
 
   /**
-   * @param $numberOfEntities
-   * @param $week
-   * @return array|int
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
-  public function getTournamentEntityIds($numberOfEntities, $week): array|int {
+  public function getTournamentEntityIds(int $numberOfEntities, int $week): array|int {
     $query = $this->entityTypeManager->getStorage('node')->getQuery()
       ->condition('type', 'tournament')
       ->condition('status', 1)
@@ -60,7 +56,6 @@ class TournamentRepository {
   }
 
   /**
-   * @return int
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
@@ -80,8 +75,6 @@ class TournamentRepository {
   }
 
   /**
-   * @param int $week
-   * @return array
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
@@ -136,36 +129,27 @@ class TournamentRepository {
         'draw' => $tournament->get('field_draw')->value,
         'goal_difference' => $tournament->get('field_goal_difference')->value,
       ];
-      usort($tournamentsWithTeams, function ($a, $b) {
-        if ($a['points'] === $b['points']) {
-          if ($a['goal_difference'] === $b['goal_difference']) {
-            return strcmp($a['team_name'], $b['team_name']);
-          }
-          return $b['goal_difference'] <=> $a['goal_difference'];
-        }
-        return $b['points'] <=> $a['points'];
-      });
+      $this->teamSorterService->sortTeams($tournamentsWithTeams);
     }
 
     return $tournamentsWithTeams;
   }
 
   /**
-   * @param $tournamentWeek
-   * @param $teamId
-   * @param int $teamPoints
-   * @param int $teamWin
-   * @param int $teamLose
-   * @param int $teamDraw
-   * @param int $teamGoalDifference
-   * @param int $playedGame
-   * @return void
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    * @throws EntityStorageException
    */
-  public function saveTournament($tournamentWeek, $teamId, int $teamPoints = 0, int $teamWin = 0, int $teamLose = 0, int $teamDraw = 0, int $teamGoalDifference = 0, int $playedGame = 0): void {
-
+  public function saveTournament(
+    int $tournamentWeek,
+    int $teamId,
+    int $teamPoints = 0,
+    int $teamWin = 0,
+    int $teamLose = 0,
+    int $teamDraw = 0,
+    int $teamGoalDifference = 0,
+    int $playedGame = 0
+  ): void {
     $teamPlayed = 0;
     $prevTeamPoints = 0;
     $prevTeamWin = 0;
@@ -224,7 +208,6 @@ class TournamentRepository {
   }
 
   /**
-   * @return void
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    * @throws EntityStorageException
@@ -234,18 +217,18 @@ class TournamentRepository {
   }
 
   /**
-   * @param $matchNumber
-   * @param $tournamentWeek
-   * @param $team1Id
-   * @param $team2Id
-   * @param $team1Score
-   * @param $team2Score
-   * @return void
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    * @throws EntityStorageException
    */
-  public function saveMatchAndTournament($matchNumber, $tournamentWeek, $team1Id, $team2Id, $team1Score, $team2Score): void {
+  public function saveMatchAndTournament(
+    int $matchNumber,
+    int $tournamentWeek,
+    int $team1Id,
+    int $team2Id,
+    int $team1Score,
+    int $team2Score
+  ): void {
     $team1Points = 0;
     $team1Wins = 0;
     $team1Lose = 0;
@@ -294,8 +277,6 @@ class TournamentRepository {
   }
 
   /**
-   * @param int $week
-   * @return void
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    * @throws EntityStorageException

@@ -9,26 +9,23 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\football_league_simulator\Repository\TournamentRepository;
 
 class MatchSimulatorService {
-  /** @var ScheduleGeneratorService  */
+
   private ScheduleGeneratorService $scheduleGeneratorService;
-  /** @var TournamentRepository  */
   protected TournamentRepository $tournamentRepository;
-  /** @var EntityTypeManagerInterface  */
   private EntityTypeManagerInterface $entityTypeManager;
 
-  /**
-   * @param ScheduleGeneratorService $scheduleGeneratorService
-   * @param TournamentRepository $tournamentRepository
-   * @param EntityTypeManagerInterface $entityTypeManager
-   */
-  public function __construct(ScheduleGeneratorService $scheduleGeneratorService, TournamentRepository $tournamentRepository, EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    ScheduleGeneratorService $scheduleGeneratorService,
+    TournamentRepository $tournamentRepository,
+    EntityTypeManagerInterface $entityTypeManager
+  ) {
     $this->scheduleGeneratorService = $scheduleGeneratorService;
     $this->tournamentRepository = $tournamentRepository;
     $this->entityTypeManager = $entityTypeManager;
   }
 
   /**
-   * @return void
+   * @throws EntityStorageException
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
@@ -41,13 +38,11 @@ class MatchSimulatorService {
   }
 
   /**
-   * @return void
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    * @throws EntityStorageException
    */
   public function generateWeekMatches(): void {
-
     $tournamentWeek = 1;
     $matchNumber = 1;
 
@@ -79,7 +74,6 @@ class MatchSimulatorService {
         $team2Score = rand(0, $team2Strength);
 
         $this->tournamentRepository->saveMatchAndTournament($matchNumber, $tournamentWeek, $team1Id, $team2Id, $team1Score, $team2Score);
-
       }
 
       $matchNumber++;
@@ -91,7 +85,6 @@ class MatchSimulatorService {
   }
 
   /**
-   * @return void
    * @throws EntityStorageException
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
@@ -107,13 +100,11 @@ class MatchSimulatorService {
   }
 
   /**
-   * @param $data
-   * @return void
    * @throws EntityStorageException
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
-  public function changeResults($data): void {
+  public function changeResults(array $data): void {
     if ($data['results']) {
       $lastPlayedWeek = $this->tournamentRepository->getLastPlayedWeek();
       if (count($data['results']) > 1) {

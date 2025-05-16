@@ -17,49 +17,34 @@ use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Controller\ControllerBase;
 
 class LeagueController extends ControllerBase {
-  /** @var MatchSimulatorService  */
+
   protected MatchSimulatorService $matchSimulatorService;
-  /** @var ProbabilityCalculatorService  */
   protected ProbabilityCalculatorService $probabilityCalculatorService;
-  /** @var ScheduleGeneratorService  */
   protected ScheduleGeneratorService $scheduleGeneratorService;
-  /** @var MatchRepository  */
   protected matchRepository $matchRepository;
-  /** @var TeamRepository  */
   protected TeamRepository $teamRepository;
-  /** @var TournamentRepository  */
   protected TournamentRepository $tournamentRepository;
 
-  /** @var array  */
   private array $tournamentData;
-  /** @var array  */
-  private array $matchesData;
-  /** @var array  */
+  private array $weekMatchesData;
   private array $allMatchesData;
-  /** @var array  */
   private array $probabilities;
-  /** @var array  */
   private array $allProbabilities;
-  /** @var int|mixed  */
   private mixed $weeksLeft;
 
   /**
-   * @param MatchSimulatorService $matchSimulatorService
-   * @param ProbabilityCalculatorService $probabilityCalculatorService
-   * @param ScheduleGeneratorService $scheduleGeneratorService
-   * @param MatchRepository $matchRepository
-   * @param TeamRepository $teamRepository
-   * @param TournamentRepository $tournamentRepository
+   * @throws EntityStorageException
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
-  public function __construct(MatchSimulatorService $matchSimulatorService,
-                              ProbabilityCalculatorService $probabilityCalculatorService,
-                              ScheduleGeneratorService $scheduleGeneratorService,
-                              MatchRepository $matchRepository,
-                              TeamRepository $teamRepository,
-                              TournamentRepository $tournamentRepository) {
-
+  public function __construct(
+    MatchSimulatorService $matchSimulatorService,
+    ProbabilityCalculatorService $probabilityCalculatorService,
+    ScheduleGeneratorService $scheduleGeneratorService,
+    MatchRepository $matchRepository,
+    TeamRepository $teamRepository,
+    TournamentRepository $tournamentRepository
+  ) {
     $this->matchSimulatorService = $matchSimulatorService;
     $this->probabilityCalculatorService = $probabilityCalculatorService;
     $this->scheduleGeneratorService = $scheduleGeneratorService;
@@ -69,21 +54,19 @@ class LeagueController extends ControllerBase {
 
     $this->matchSimulatorService->generateFirstWeek();
     $this->tournamentData = $this->tournamentRepository->getTournamentData();
-    $this->matchesData = $this->matchRepository->getMatchesData();
+    $this->weekMatchesData = $this->matchRepository->getMatchesData();
+    $this->allMatchesData = $this->matchRepository->getMatchesData(-1);
     $this->probabilities = $this->probabilityCalculatorService->calculateWeekWinProbabilities();
     $this->allProbabilities = $this->probabilityCalculatorService->calculateTournamentWinProbabilities();
-    $this->allMatchesData = $this->matchRepository->getAllMatchesData();
     $this->weeksLeft = $this->scheduleGeneratorService->weeksLeft();
   }
 
   /**
-   * @param ContainerInterface $container
-   * @return LeagueController|static
+   * @throws EntityStorageException
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
   public static function create(ContainerInterface $container): LeagueController|static {
-    /** @var TYPE_NAME $container */
     return new static(
       $container->get('football_league_simulator.match_simulator_service'),
       $container->get('football_league_simulator.probability_calculator_service'),
@@ -95,7 +78,6 @@ class LeagueController extends ControllerBase {
   }
 
   /**
-   * @return JsonResponse
    * @throws EntityStorageException
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
@@ -109,7 +91,6 @@ class LeagueController extends ControllerBase {
   }
 
   /**
-   * @return JsonResponse
    * @throws EntityStorageException
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
@@ -123,7 +104,6 @@ class LeagueController extends ControllerBase {
   }
 
   /**
-   * @return JsonResponse
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    * @throws EntityStorageException
@@ -135,8 +115,6 @@ class LeagueController extends ControllerBase {
   }
 
   /**
-   * @param Request $request
-   * @return JsonResponse
    * @throws EntityStorageException
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
@@ -148,16 +126,13 @@ class LeagueController extends ControllerBase {
     return new JsonResponse(['success' => TRUE, 'status' => 'ok', 'received' => $data]);
   }
 
-  /**
-   * @return array
-   */
   public function overview(): array {
     $session = \Drupal::service('session');
     $lastAction = $session->get('last_action', 'simulateWeek');
 
     $matches = ($lastAction === 'playAllMatches')
       ? $this->allMatchesData
-      : $this->matchesData;
+      : $this->weekMatchesData;
 
     $probabilities = ($lastAction === 'playAllMatches')
       ? $this->allProbabilities
@@ -174,4 +149,5 @@ class LeagueController extends ControllerBase {
       ],
     ];
   }
+
 }

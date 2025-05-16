@@ -11,12 +11,16 @@ services:
     arguments:
       - '@football_league_simulator.schedule_generator_service'
       - '@football_league_simulator.tournament_repository'
+      - '@football_league_simulator.team_sorter_service'
 
   football_league_simulator.schedule_generator_service:
     class: Drupal\football_league_simulator\Service\ScheduleGeneratorService
     arguments:
       - '@football_league_simulator.team_repository'
       - '@football_league_simulator.tournament_repository'
+
+  football_league_simulator.team_sorter_service:
+    class: Drupal\football_league_simulator\Service\TeamSorterService
 
   football_league_simulator.match_repository:
     class: Drupal\football_league_simulator\Repository\MatchRepository
@@ -34,3 +38,4 @@ services:
     arguments:
       - '@football_league_simulator.team_repository'
       - '@entity_type.manager'
+      - '@football_league_simulator.team_sorter_service'
