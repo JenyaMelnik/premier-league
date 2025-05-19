@@ -1,0 +1,23 @@
+uuid: 7560529c-ef66-4cdb-bc3c-d3758f23af42
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_team_2_id
+    - node.type.match
+id: node.match.field_team_2_id
+field_name: field_team_2_id
+entity_type: node
+bundle: match
+label: 'team 2 id'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

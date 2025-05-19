@@ -1,0 +1,23 @@
+uuid: 5e7ac343-c938-42cf-b3e2-b5b44bd3b380
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_draw
+    - node.type.tournament
+id: node.tournament.field_draw
+field_name: field_draw
+entity_type: node
+bundle: tournament
+label: draw
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

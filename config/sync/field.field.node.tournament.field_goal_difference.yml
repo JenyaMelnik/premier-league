@@ -1,0 +1,23 @@
+uuid: 53103ba6-98b4-43b8-a527-afffd94637ba
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_goal_difference
+    - node.type.tournament
+id: node.tournament.field_goal_difference
+field_name: field_goal_difference
+entity_type: node
+bundle: tournament
+label: 'goal difference'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

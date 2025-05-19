@@ -1,0 +1,23 @@
+uuid: 9ca75613-d0a8-47f6-ab1d-43e470a29340
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_lose
+    - node.type.tournament
+id: node.tournament.field_lose
+field_name: field_lose
+entity_type: node
+bundle: tournament
+label: lose
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

@@ -1,0 +1,23 @@
+uuid: bfdea4a7-a050-486f-b730-1c2eb8828839
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_score_team_2
+    - node.type.match
+id: node.match.field_score_team_2
+field_name: field_score_team_2
+entity_type: node
+bundle: match
+label: 'score team 2'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

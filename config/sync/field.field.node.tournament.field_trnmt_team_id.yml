@@ -1,0 +1,23 @@
+uuid: 09db0878-9d18-4b9d-8f1d-2d34a55b7146
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_trnmt_team_id
+    - node.type.tournament
+id: node.tournament.field_trnmt_team_id
+field_name: field_trnmt_team_id
+entity_type: node
+bundle: tournament
+label: 'trnmt team id'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

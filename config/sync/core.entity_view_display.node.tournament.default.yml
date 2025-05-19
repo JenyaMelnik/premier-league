@@ -1,0 +1,99 @@
+uuid: 3c1637b0-65f7-48bf-8fed-a6c032b69c44
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.tournament.field_draw
+    - field.field.node.tournament.field_goal_difference
+    - field.field.node.tournament.field_lose
+    - field.field.node.tournament.field_played
+    - field.field.node.tournament.field_points
+    - field.field.node.tournament.field_tournament_week
+    - field.field.node.tournament.field_trnmt_team_id
+    - field.field.node.tournament.field_win
+    - node.type.tournament
+  module:
+    - user
+id: node.tournament.default
+targetEntityType: node
+bundle: tournament
+mode: default
+content:
+  field_draw:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 108
+    region: content
+  field_goal_difference:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 109
+    region: content
+  field_lose:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 107
+    region: content
+  field_played:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 105
+    region: content
+  field_points:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 104
+    region: content
+  field_tournament_week:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 102
+    region: content
+  field_trnmt_team_id:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 103
+    region: content
+  field_win:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 106
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden: {  }
