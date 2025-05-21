@@ -21,7 +21,7 @@ class LeagueController extends ControllerBase {
   protected MatchSimulatorService $matchSimulatorService;
   protected ProbabilityCalculatorService $probabilityCalculatorService;
   protected ScheduleGeneratorService $scheduleGeneratorService;
-  protected matchRepository $matchRepository;
+  protected MatchRepository $matchRepository;
   protected TeamRepository $teamRepository;
   protected TournamentRepository $tournamentRepository;
 
