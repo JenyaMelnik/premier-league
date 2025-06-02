@@ -1,0 +1,23 @@
+uuid: 9d48c294-5aa7-4308-b9d4-64026d1917e7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_tournament_week
+    - node.type.tournament
+id: node.tournament.field_tournament_week
+field_name: field_tournament_week
+entity_type: node
+bundle: tournament
+label: 'tournament week'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

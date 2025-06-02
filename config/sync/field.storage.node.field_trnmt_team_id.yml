@@ -1,0 +1,20 @@
+uuid: c32358c7-fbe0-45d2-907e-08b83f84f394
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_trnmt_team_id
+field_name: field_trnmt_team_id
+entity_type: node
+type: integer
+settings:
+  unsigned: false
+  size: normal
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

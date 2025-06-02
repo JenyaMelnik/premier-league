@@ -6,11 +6,38 @@ football_league_simulator.overview:
   requirements:
     _permission: 'access content'
 
-football_league_simulator.save_results:
-  path: '/football-league/save-results'
+football_league_simulator.simulate_week:
+  path: '/football-league/simulate-week'
   defaults:
-    _controller: '\Drupal\football_league_simulator\Controller\LeagueController::saveMatchResults'
+    _controller: 'Drupal\football_league_simulator\Controller\LeagueController::simulateWeek'
+    _title: 'Simulate Week'
   requirements:
     _permission: 'access content'
   methods: [POST]
 
+football_league_simulator.play_all_matches:
+  path: '/football-league/play-all-matches'
+  defaults:
+    _controller: 'Drupal\football_league_simulator\Controller\LeagueController::playAllMatches'
+    _title: 'Play all matches'
+  requirements:
+    _permission: 'access content'
+  methods: [POST]
+
+football_league_simulator.play_new_tournament:
+  path: '/football-league/play-new-tournament'
+  defaults:
+    _controller: 'Drupal\football_league_simulator\Controller\LeagueController::playNewTournament'
+    _title: 'Play new tournament'
+  requirements:
+    _permission: 'access content'
+  methods: [ POST ]
+
+football_league_simulator.save_result:
+  path: '/football-league/save-result'
+  defaults:
+    _controller: 'Drupal\football_league_simulator\Controller\LeagueController::saveResult'
+    _title: 'Save result'
+  requirements:
+    _permission: 'access content'
+  methods: [ POST ]

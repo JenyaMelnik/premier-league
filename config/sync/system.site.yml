@@ -1,0 +1,15 @@
+_core:
+  default_config_hash: ijfbzDTN4CbE7Sr-6ubWzy_t1vH4OtU1doNCLssVz-4
+langcode: en
+uuid: bb2391fc-c312-460f-8284-c9a3a919bebf
+name: 'premier league'
+mail: jenyamelnik1986@i.ua
+slogan: ''
+page:
+  403: ''
+  404: ''
+  front: /football-league
+admin_compact_mode: false
+weight_select_max: 100
+default_langcode: en
+mail_notification: null

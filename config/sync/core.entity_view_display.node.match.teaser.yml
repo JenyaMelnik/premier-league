@@ -1,0 +1,30 @@
+uuid: 689d92a3-4e65-4280-bbf2-fd1ff8652fac
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.match.field_match_week
+    - field.field.node.match.field_score_team_1
+    - field.field.node.match.field_score_team_2
+    - field.field.node.match.field_team_1_id
+    - field.field.node.match.field_team_2_id
+    - node.type.match
+  module:
+    - user
+id: node.match.teaser
+targetEntityType: node
+bundle: match
+mode: teaser
+content:
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_match_week: true
+  field_score_team_1: true
+  field_score_team_2: true
+  field_team_1_id: true
+  field_team_2_id: true

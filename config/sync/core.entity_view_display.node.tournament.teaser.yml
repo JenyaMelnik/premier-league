@@ -1,0 +1,36 @@
+uuid: ec0e152c-6d0e-4690-a01b-22d01d2c6c6f
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.tournament.field_draw
+    - field.field.node.tournament.field_goal_difference
+    - field.field.node.tournament.field_lose
+    - field.field.node.tournament.field_played
+    - field.field.node.tournament.field_points
+    - field.field.node.tournament.field_tournament_week
+    - field.field.node.tournament.field_trnmt_team_id
+    - field.field.node.tournament.field_win
+    - node.type.tournament
+  module:
+    - user
+id: node.tournament.teaser
+targetEntityType: node
+bundle: tournament
+mode: teaser
+content:
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_draw: true
+  field_goal_difference: true
+  field_lose: true
+  field_played: true
+  field_points: true
+  field_tournament_week: true
+  field_trnmt_team_id: true
+  field_win: true

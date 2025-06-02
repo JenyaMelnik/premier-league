@@ -1,0 +1,23 @@
+uuid: 6b479196-f222-430e-9b66-1b1525fcaa11
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_points
+    - node.type.tournament
+id: node.tournament.field_points
+field_name: field_points
+entity_type: node
+bundle: tournament
+label: points
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

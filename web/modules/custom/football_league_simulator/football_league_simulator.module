@@ -1,12 +1,26 @@
 <?php
-
+/**
+ * @return array[]
+ */
 function football_league_simulator_theme() {
   return [
     'football_league_overview' => [
       'variables' => [
         'title' => NULL,
         'message' => NULL,
+        'teams' => [],
+        'weeksLeft' => [],
+        'probabilities' => [],
+        'matches' => [],
       ],
+      'template' => 'football-league-overview',
     ],
   ];
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function football_league_simulator_page_attachments(array &$attachments) {
+  $attachments['#attached']['library'][] = 'football_league_simulator/custom_styles';
 }

@@ -1,0 +1,69 @@
+uuid: c74f111f-60ad-4cd4-99da-61e9c976e10e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.match.field_match_week
+    - field.field.node.match.field_score_team_1
+    - field.field.node.match.field_score_team_2
+    - field.field.node.match.field_team_1_id
+    - field.field.node.match.field_team_2_id
+    - node.type.match
+  module:
+    - user
+id: node.match.default
+targetEntityType: node
+bundle: match
+mode: default
+content:
+  field_match_week:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 106
+    region: content
+  field_score_team_1:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 104
+    region: content
+  field_score_team_2:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 105
+    region: content
+  field_team_1_id:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 102
+    region: content
+  field_team_2_id:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 103
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden: {  }

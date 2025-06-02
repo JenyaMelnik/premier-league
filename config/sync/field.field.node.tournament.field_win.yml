@@ -1,0 +1,23 @@
+uuid: 5be199d5-7a39-41d3-8f6c-a3e03df70a94
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_win
+    - node.type.tournament
+id: node.tournament.field_win
+field_name: field_win
+entity_type: node
+bundle: tournament
+label: win
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

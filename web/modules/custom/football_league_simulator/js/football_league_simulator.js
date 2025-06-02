@@ -1,40 +1,93 @@
 (function ($, Drupal) {
-  Drupal.behaviors.footballLeagueEditResults = {
+  Drupal.behaviors.footballLeagueSimulator = {
     attach: function (context, settings) {
-      $('#save-results', context).once('saveResultsAjax').on('click', function () {
-        const formData = $('#edit-results-form').serialize();
-
-        $.ajax({
-          url: '/football-league/save-results',
-          type: 'POST',
-          data: formData,
-          dataType: 'json',
-          success: function (response) {
-            if (response.status === 'success') {
-              let tableHtml = '<thead><tr><th>Team</th><th>Points</th><th>GF</th><th>GA</th><th>GD</th><th>Win Chance (%)</th></tr></thead><tbody>';
-              response.table.forEach(team => {
-                tableHtml += `<tr>
-                  <td>${team.name}</td>
-                  <td>${team.points}</td>
-                  <td>${team.goals_for}</td>
-                  <td>${team.goals_against}</td>
-                  <td>${team.goal_difference}</td>
-                  <td>${team.win_chance}%</td>
-                </tr>`;
-              });
-              tableHtml += '</tbody>';
-              $('#league-table table').html(tableHtml);
-
-              alert('Results updated successfully!');
-            } else {
-              alert('Failed to update results.');
+      // Check if the handler is bound.
+      if (!$('#simulate-week').data('clicked')) {
+        $('#simulate-week', context).on('click', function (e) {
+          e.preventDefault();
+          $.ajax({
+            url: Drupal.url('football-league/simulate-week'),
+            type: 'POST',
+            dataType: 'json',
+            success: function (response) {
+              if (response.success) {
+                location.reload();
+              } else {
+                alert('Error when generating the week.');
+              }
             }
-          },
-          error: function () {
-            alert('An error occurred while saving the results.');
-          },
+          });
+
+          // Mark that the handler has been bound.
+          $('#simulate-week').data('clicked', true);
         });
-      });
-    },
+      }
+
+      if (!$('#play-all-matches').data('clicked')) {
+        $('#play-all-matches', context).on('click', function (e) {
+          e.preventDefault();
+          $.ajax({
+            url: Drupal.url('football-league/play-all-matches'),
+            type: 'POST',
+            dataType: 'json',
+            success: function (response) {
+              if (response.success) {
+                location.reload();
+              } else {
+                alert('Error when generating all matches.');
+              }
+            }
+          });
+
+          // Mark that the handler has been bound.
+          $('#play-all-matches').data('clicked', true);
+        });
+      }
+
+      if (!$('#play-new-tournament').data('clicked')) {
+        $('#play-new-tournament', context).on('click', function (e) {
+          e.preventDefault();
+          $.ajax({
+            url: Drupal.url('football-league/play-new-tournament'),
+            type: 'POST',
+            dataType: 'json',
+            success: function (response) {
+              if (response.success) {
+                location.reload();
+              } else {
+                alert('Error when generating all matches.');
+              }
+            }
+          });
+
+          // Mark that the handler has been bound.
+          $('#play-new-tournament').data('clicked', true);
+        });
+      }
+
+      if (!$('#save-results').data('clicked')) {
+        $('#save-results', context).on('click', function (e) {
+          e.preventDefault();
+
+          const formData = $('#edit-results-form').serialize();
+          $.ajax({
+            url: Drupal.url('football-league/save-result'),
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+              if (response.success) {
+                // alert(formData);
+                location.reload();
+              } else {
+                alert('Error when saving result.');
+              }
+            }
+          });
+
+          // Mark that the handler has been bound.
+          $('#save-results').data('clicked', true);
+        });
+      }
+    }
   };
 })(jQuery, Drupal);

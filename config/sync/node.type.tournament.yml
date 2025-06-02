@@ -1,0 +1,18 @@
+uuid: a62e9faa-b2b4-4295-ae03-448c5659da2d
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+    parent: 'main:'
+name: tournament
+type: tournament
+description: null
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: true

@@ -1,0 +1,23 @@
+uuid: a19711f8-6023-440f-99ef-1cee11898e4d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_match_week
+    - node.type.match
+id: node.match.field_match_week
+field_name: field_match_week
+entity_type: node
+bundle: match
+label: 'match week'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

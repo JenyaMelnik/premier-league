@@ -1,0 +1,29 @@
+uuid: 7ea704f6-a2ea-4bee-89fa-a49daeab18e2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.team.field_team_strength
+    - node.type.team
+  module:
+    - user
+id: node.team.default
+targetEntityType: node
+bundle: team
+mode: default
+content:
+  field_team_strength:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 102
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden: {  }
