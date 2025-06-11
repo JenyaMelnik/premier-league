@@ -40,16 +40,6 @@ This will set up:
 lando drush site:install --db-url=mysql://drupal10:drupal10@database/drupal10 -y
 ```
 
-5. Create Team Content Types:
-   - Log in to your Drupal admin panel
-   - Go to Structure > Content types > Add content type
-   - Create a new content type called "Team"
-   - Add the following fields:
-     - Name (Text field - already provided by default title)
-     - Team Strength (Number field - integer)
-   - Save the content type
-   - Create at least 4 teams with their respective names and strength ratings
-
 ## Configuration
 
 ### Local Settings
@@ -61,10 +51,6 @@ cp web/sites/example.settings.local.php web/sites/default/settings.local.php
 
 2. Add the following to `web/sites/default/settings.php`:
 ```php
-// Include local development settings
-if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
-  include $app_root . '/' . $site_path . '/settings.local.php';
-}
 
 // Set configuration sync directory
 $settings['config_sync_directory'] = '../config/sync';
