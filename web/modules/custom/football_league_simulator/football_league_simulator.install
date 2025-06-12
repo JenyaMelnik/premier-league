@@ -17,7 +17,7 @@ function football_league_simulator_install() {
     $node = Node::create([
       'type' => 'team',
       'title' => $team['title'],
-      'field_team_strength' => $team['team_strength'],
+      'field_team_strength' => ['value' => $team['team_strength']],
       'status' => 1,
     ]);
     $node->save();
