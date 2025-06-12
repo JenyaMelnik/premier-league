@@ -1,10 +1,11 @@
 # Premier League Project
 
-A Drupal 10 based project for Premier League website.
+A Drupal 10 based project for the Premier League website.
 
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
+
 - [Git](https://git-scm.com/)
 - [Composer](https://getcomposer.org/) (PHP package manager)
 - [Lando](https://lando.dev/) (Local development environment)
@@ -14,67 +15,98 @@ Before you begin, ensure you have the following installed:
 ## Installation
 
 1. Clone the repository:
+
 ```bash
-git clone [repository-url]
+git clone git@github.com:JenyaMelnik/premier-league.git
 cd premier-league
 ```
 
 2. Install PHP dependencies:
+
 ```bash
 composer install
 ```
 
-3. Start the Lando environment:
+3. In the root of the site create a `.lando.yml` file. You can configure it yourself, or you can copy the settings below:
+
+```yaml
+name: premier-league
+recipe: drupal10
+config:
+  webroot: web
+proxy:
+  appserver:
+    - premier-league.lndo.site
+services:
+  appserver:
+    build_as_root:
+      - composer global require drush/drush
+      - apt-get update -y
+      - apt-get install -y curl unzip
+      - curl -sS https://getcomposer.org/installer | php
+      - mv composer.phar /usr/local/bin/composer
+      - chmod +x /usr/local/bin/composer
+```
+
+4. Start the Lando environment:
+
 ```bash
 lando start
 ```
 
-This will set up:
-- A Drupal 10 site at http://premier-league.lndo.site
-- PHP 8.1
-- MySQL database
-- Drush
+5. Open the site in your browser, if you copied Lando's settings, it should be: https://premier-league.lndo.site/
 
-4. Install Drupal using Drush:
-```bash
-lando drush site:install --db-url=mysql://drupal10:drupal10@database/drupal10 -y
-```
+6. Setting up the site. At the 'set up database' step:
 
-## Configuration
+- **Database name**: `drupal10`
+- **Database username**: `drupal10`
+- **Database password**: `drupal10`
+- Go to **Advanced options → Host** and set it to `database`
 
-### Local Settings
+7. In `web/sites/default/settings.php` file, change the path to the configuration directory:
 
-1. Copy the example settings file:
-```bash
-cp web/sites/example.settings.local.php web/sites/default/settings.local.php
-```
-
-2. Add the following to `web/sites/default/settings.php`:
 ```php
-
-// Set configuration sync directory
 $settings['config_sync_directory'] = '../config/sync';
 ```
 
-The `settings.local.php` inclusion allows you to have environment-specific settings for local development that won't be committed to the repository. This is where you can put development-friendly settings like:
-- Error display settings
-- Debug mode configurations
-- Local database credentials
-- Development-specific modules
+8. Synchronize the UUID:
 
-The `config_sync_directory` setting is crucial for configuration management. It tells Drupal where to store and read configuration files, keeping them:
-- Outside the web root for better security
-- In a version-controlled location
-- Accessible for configuration import/export operations
+```bash
+lando drush cset system.site uuid bb2391fc-c312-460f-8284-c9a3a919bebf
+```
 
-## Development
+9. Import configuration:
+
+```bash
+lando drush cim
+```
+
+If an error related to the `shortcut` and `shortcut_set` entities appears, run:
+
+```bash
+lando drush ev "\Drupal::entityTypeManager()->getStorage('shortcut')->delete(\Drupal::entityTypeManager()->getStorage('shortcut')->loadMultiple());"
+lando drush ev "\Drupal::entityTypeManager()->getStorage('shortcut_set')->delete(\Drupal::entityTypeManager()->getStorage('shortcut_set')->loadMultiple());"
+```
+
+Then import configuration again:
+
+```bash
+lando drush cim
+```
+
+Clear the cache:
+
+```bash
+lando drush cr
+```
+
+10. Now you can use the site.
 
 ### Useful Lando Commands
 
 - `lando start` - Start the environment
 - `lando stop` - Stop the environment
 - `lando drush` - Run Drush commands
-- `lando composer` - Run Composer commands
 - `lando mysql` - Access the database
 
 ### Project Structure
@@ -84,21 +116,7 @@ The `config_sync_directory` setting is crucial for configuration management. It 
 - `/web/themes/custom` - Custom themes
 - `/config` - Configuration management directory
 
-## Troubleshooting
-
-### Common Issues
-
-1. If you get permission errors:
-```bash
-lando drush cr
-```
-
-2. If the site is not accessible:
-- Check if Lando is running: `lando list`
-- Verify the URL: http://premier-league.lndo.site
-- Clear Drupal cache: `lando drush cr`
-
-### Support
+## Support
 
 For issues and support, please create an issue in the GitHub repository.
 
