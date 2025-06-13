@@ -32,17 +32,18 @@ function football_league_simulator_install() {
   // Create the team strength field if it doesn't exist
   $field_storage = FieldStorageConfig::loadByName('node', 'field_team_strength');
   if (!$field_storage) {
-    FieldStorageConfig::create([
+    $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_team_strength',
       'entity_type' => 'node',
       'type' => 'integer',
       'cardinality' => 1,
-    ])->save();
+    ]);
+    $field_storage->save();
   }
 
   $field = FieldConfig::load('node.team.field_team_strength');
   if (!$field) {
-    FieldConfig::create([
+    $field = FieldConfig::create([
       'field_storage' => $field_storage,
       'bundle' => 'team',
       'label' => 'Team Strength',
@@ -51,7 +52,8 @@ function football_league_simulator_install() {
         'min' => 1,
         'max' => 5,
       ],
-    ])->save();
+    ]);
+    $field->save();
   }
 
   // Now create the teams
