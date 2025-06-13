@@ -1,4 +1,7 @@
 <?php
+
+use Drupal\node\Entity\Node;
+
 /**
  * @return array[]
  */
@@ -21,6 +24,34 @@ function football_league_simulator_theme() {
 /**
  * Implements hook_page_attachments().
  */
-function football_league_simulator_page_attachments(array &$attachments) {
+function football_league_simulator_page_attachments(array &$attachments): void {
   $attachments['#attached']['library'][] = 'football_league_simulator/custom_styles';
+}
+
+/**
+ * Implements hook_post_config_import().
+ */
+function football_league_simulator_post_config_import(): void{
+  $definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('node', 'team');
+  if (!isset($definitions['field_team_strength'])) {
+    Drupal::logger('football_league_simulator')->warning('Field field_team_strength does not exist yet.');
+    return;
+  }
+
+  $teams = [
+    ['title' => 'Arsenal', 'team_strength' => 4],
+    ['title' => 'Liverpool', 'team_strength' => 5],
+    ['title' => 'Manchester city', 'team_strength' => 3],
+    ['title' => 'Chelsea', 'team_strength' => 2],
+  ];
+
+  foreach ($teams as $team) {
+    $node = Node::create([
+      'type' => 'team',
+      'title' => $team['title'],
+      'field_team_strength' => [['value' => $team['team_strength']]],
+      'status' => 1,
+    ]);
+    $node->save();
+  }
 }
