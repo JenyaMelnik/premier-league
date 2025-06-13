@@ -5,7 +5,7 @@ use Drupal\node\Entity\Node;
 /**
  * Create initial teams after config has been imported.
  */
-function football_league_simulator_post_update_create_teams(): void {
+function football_league_simulator_post_update_create_initial_teams(): void {
   $teams = [
     ['title' => 'Arsenal', 'team_strength' => 4],
     ['title' => 'Liverpool', 'team_strength' => 5],
