@@ -1,11 +1,60 @@
 <?php
 
 use Drupal\node\Entity\Node;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Implements hook_install().
  */
 function football_league_simulator_install() {
+  // Create the team content type if it doesn't exist
+  $values = [
+    'type' => 'team',
+    'name' => 'Team',
+    'base' => 'node_content',
+    'description' => 'A team participating in the football league',
+    'custom' => 1,
+    'modified' => 1,
+    'locked' => 0,
+  ];
+  $node_type = \Drupal::entityTypeManager()
+    ->getStorage('node_type')
+    ->load($values['type']);
+
+  if (!$node_type) {
+    $node_type = \Drupal::entityTypeManager()
+      ->getStorage('node_type')
+      ->create($values);
+    $node_type->save();
+  }
+
+  // Create the team strength field if it doesn't exist
+  $field_storage = FieldStorageConfig::loadByName('node', 'field_team_strength');
+  if (!$field_storage) {
+    FieldStorageConfig::create([
+      'field_name' => 'field_team_strength',
+      'entity_type' => 'node',
+      'type' => 'integer',
+      'cardinality' => 1,
+    ])->save();
+  }
+
+  $field = FieldConfig::load('node.team.field_team_strength');
+  if (!$field) {
+    FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'team',
+      'label' => 'Team Strength',
+      'description' => 'The strength of the team (1-5)',
+      'settings' => [
+        'min' => 1,
+        'max' => 5,
+      ],
+    ])->save();
+  }
+
+  // Now create the teams
   $teams = [
     ['title' => 'Arsenal', 'team_strength' => 4],
     ['title' => 'Liverpool', 'team_strength' => 5],
@@ -14,12 +63,22 @@ function football_league_simulator_install() {
   ];
 
   foreach ($teams as $team) {
-    $node = Node::create([
-      'type' => 'team',
-      'title' => $team['title'],
-      'field_team_strength' => ['value' => $team['team_strength']],
-      'status' => 1,
-    ]);
-    $node->save();
+    // Check if a team with this name already exists
+    $existing_teams = \Drupal::entityQuery('node')
+      ->condition('type', 'team')
+      ->condition('title', $team['title'])
+      ->accessCheck(FALSE)
+      ->execute();
+
+    // Only create the team if it doesn't exist
+    if (empty($existing_teams)) {
+      $node = Node::create([
+        'type' => 'team',
+        'title' => $team['title'],
+        'field_team_strength' => ['value' => $team['team_strength']],
+        'status' => 1,
+      ]);
+      $node->save();
+    }
   }
 }
