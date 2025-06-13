@@ -11,7 +11,7 @@ entity_type: node
 bundle: team
 label: 'team strength'
 description: 'min 1, max 20'
-required: false
+required: true
 translatable: false
 default_value:
   -
