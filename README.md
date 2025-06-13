@@ -81,7 +81,7 @@ lando drush cset system.site uuid bb2391fc-c312-460f-8284-c9a3a919bebf
 lando drush cim
 ```
 
-If an error related to the `shortcut` and `shortcut_set` entities appears, run:
+If an error related to the `shortcut` or `shortcut_set` entities appears, run:
 
 ```bash
 lando drush ev "\Drupal::entityTypeManager()->getStorage('shortcut')->delete(\Drupal::entityTypeManager()->getStorage('shortcut')->loadMultiple());"
