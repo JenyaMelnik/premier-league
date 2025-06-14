@@ -100,12 +100,6 @@ Clear the cache:
 lando drush cr
 ```
 
-Update the database:
-
-```bash
-lando drush updatedb
-```
-
 10. Now you can use the site.
 
 ### Useful Lando Commands
