@@ -45,6 +45,7 @@ class MatchSimulatorService {
   public function generateWeekMatches(): void {
     $tournamentWeek = 1;
     $matchNumber = 1;
+    $defaultStrength = 4;
 
     // Get the last tournament week.
     $nodeId = $this->tournamentRepository->getLastTournamentEntityIds(1);
@@ -68,8 +69,8 @@ class MatchSimulatorService {
       if ($team1Id && $team2Id) {
         $team1 = $this->entityTypeManager->getStorage('node')->load($team1Id);
         $team2 = $this->entityTypeManager->getStorage('node')->load($team2Id);
-        $team1Strength = $team1->get('field_team_strength')->value;
-        $team2Strength = $team2->get('field_team_strength')->value;
+        $team1Strength = $team1->get('field_team_strength')->value ?? $defaultStrength;
+        $team2Strength = $team2->get('field_team_strength')->value ?? $defaultStrength;
         $team1Score = rand(0, $team1Strength);
         $team2Score = rand(0, $team2Strength);
 
