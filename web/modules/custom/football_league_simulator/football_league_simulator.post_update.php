@@ -3,9 +3,9 @@
 use Drupal\node\Entity\Node;
 
 /**
- * Implements hook_install().
+ * Create initial teams after config has been imported.
  */
-function football_league_simulator_install(): void{
+function football_league_simulator_post_update_create_teams(array &$sandbox): void {
   $teams = [
     ['title' => 'Arsenal', 'team_strength' => 4],
     ['title' => 'Liverpool', 'team_strength' => 5],
@@ -17,7 +17,7 @@ function football_league_simulator_install(): void{
     $node = Node::create([
       'type' => 'team',
       'title' => $team['title'],
-      'field_team_strength' => ['value' => $team['team_strength']],
+      'field_team_strength' => [['value' => $team['team_strength']]],
       'status' => 1,
     ]);
     $node->save();
