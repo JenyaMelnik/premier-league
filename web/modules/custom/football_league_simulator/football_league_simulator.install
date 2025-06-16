@@ -5,7 +5,7 @@ use Drupal\node\Entity\Node;
 /**
  * Implements hook_install().
  */
-function football_league_simulator_install(): void{
+function football_league_simulator_install(): void {
   $teams = [
     ['title' => 'Arsenal', 'team_strength' => 4],
     ['title' => 'Liverpool', 'team_strength' => 5],
@@ -13,13 +13,24 @@ function football_league_simulator_install(): void{
     ['title' => 'Chelsea', 'team_strength' => 2],
   ];
 
+  $storage = \Drupal::entityTypeManager()->getStorage('node');
+
   foreach ($teams as $team) {
-    $node = Node::create([
-      'type' => 'team',
-      'title' => $team['title'],
-      'field_team_strength' => ['value' => $team['team_strength']],
-      'status' => 1,
-    ]);
-    $node->save();
+    // Check if a node with this title and team type already exists
+    $query = $storage->getQuery()
+      ->accessCheck(false)
+      ->condition('type', 'team')
+      ->condition('title', $team['title']);
+    $nids = $query->execute();
+
+    if (empty($nids)) {
+      $node = Node::create([
+        'type' => 'team',
+        'title' => $team['title'],
+        'field_team_strength' => ['value' => $team['team_strength']],
+        'status' => 1,
+      ]);
+      $node->save();
+    }
   }
 }
